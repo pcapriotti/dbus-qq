@@ -1,7 +1,7 @@
 Name: dbus-qq
 Version: 0.0.1
 Synopsis: Quasi-quoter for DBus functions
-Description: This package contains a quasi-quoter to automatically convert functions of the form [Variant] -> [Variant] to functions of the actual types, returning a tuple of the results.
+Description: This package contains a quasi-quoter to automatically convert functions of the form @[Variant] -> [Variant]@ to functions of the actual types, returning a tuple of the results.
 License: BSD3
 License-file: LICENSE
 Author: Paolo Capriotti

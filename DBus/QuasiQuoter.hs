@@ -1,6 +1,6 @@
 module DBus.QuasiQuoter (
   dbus,
-  dbusM,
+  dbusF,
 ) where
 
 import Control.Applicative
@@ -16,6 +16,33 @@ import Text.ParserCombinators.Parsec hiding ((<|>), many)
 
 data DBusFunction = DBusFunction [Type] [Type]
 
+-- |A quasi-quoter to convert a function of type @[Variant] -> [Variant]@ into a
+-- function of a specified static type.
+--
+-- This quasi-quoter takes a signature of the form:
+--
+-- @
+--   \<dbus types\> -> \<dbus types\>
+-- @
+--
+-- Types on the left of the arrow correspond to argument types, while those on
+-- the right are return types.
+--
+-- The result is a combinator which takes any function of type [Variant] ->
+-- [Variant], assumes that its arguments and results are of the specified
+-- number and types, and returns a function of the corresponding static type.
+--
+-- For example, if @f :: [Variant] -> [Variant]@,
+--
+-- @
+--   [dbus| i s -> s a{uv} |] f
+-- @
+--
+-- has type
+--
+-- @
+--   Int -> String -> (String, Map Word32 Variant)
+-- @
 dbus :: QuasiQuoter
 dbus = QuasiQuoter
   { quoteExp = expQuoter False
@@ -24,8 +51,10 @@ dbus = QuasiQuoter
   , quoteDec = undefined
   }
 
-dbusM :: QuasiQuoter
-dbusM = QuasiQuoter
+-- |A generalized version of the dbus quasi-quoter which works on functions of
+-- type @[Variant] -> f [Variant]@, for any functor @f@.
+dbusF :: QuasiQuoter
+dbusF = QuasiQuoter
   { quoteExp = expQuoter True
   , quotePat = undefined
   , quoteType = typeQuoter
