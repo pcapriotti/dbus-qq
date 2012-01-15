@@ -1,3 +1,5 @@
+{-# LANGUAGE TemplateHaskell, QuasiQuotes #-}
+
 module DBus.QuasiQuoter (
   dbus,
   dbusF,
