@@ -8,9 +8,14 @@ Author: Paolo Capriotti
 Maintainer: p.capriotti@gmail.com
 Category: Network
 Build-type: Simple
-Cabal-version: >=1.2
+Cabal-version: >=1.8
+Extra-source-files: Tests.hs
 
 Library
     Exposed-modules: DBus.QuasiQuoter
     Build-depends: base (== 4.*), parsec (== 3.1.*), dbus-core (== 0.9.*), template-haskell, containers (< 0.5)
     Extensions: TemplateHaskell, QuasiQuotes
+
+Source-repository head
+    type: git
+    location: git://github.com/pcapriotti/dbus-qq.git
