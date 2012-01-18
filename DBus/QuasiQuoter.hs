@@ -18,8 +18,8 @@ import Text.ParserCombinators.Parsec hiding ((<|>), many)
 
 data DBusFunction = DBusFunction [Type] [Type]
 
--- |A quasi-quoter to convert a function of type @[Variant] -> [Variant]@ into a
--- function of a specified static type.
+-- |A quasi-quoter to convert a function of type @['DT.Variant'] ->
+-- ['DT.Variant']@ into a function of a specified static type.
 --
 -- This quasi-quoter takes a signature of the form:
 --
@@ -30,20 +30,20 @@ data DBusFunction = DBusFunction [Type] [Type]
 -- Types on the left of the arrow correspond to argument types, while those on
 -- the right are return types.
 --
--- The result is a combinator which takes any function of type [Variant] ->
--- [Variant], assumes that its arguments and results are of the specified
+-- The result is a combinator which takes any function of type ['DT.Variant'] ->
+-- ['DT.Variant'], assumes that its arguments and results are of the specified
 -- number and types, and returns a function of the corresponding static type.
 --
--- For example, if @f :: [Variant] -> [Variant]@,
+-- For example, if @f :: ['DT.Variant'] -> ['DT.Variant']@,
 --
 -- @
---   [dbus| i s -> s a{uv} |] f
+--   ['dbus'| i s -> s a{uv} |] f
 -- @
 --
 -- has type
 --
 -- @
---   Int -> String -> (String, Map Word32 Variant)
+--   Int -> String -> (String, 'Map.Map' 'Word32' 'DT.Variant')
 -- @
 dbus :: QuasiQuoter
 dbus = QuasiQuoter
@@ -53,8 +53,8 @@ dbus = QuasiQuoter
   , quoteDec = undefined
   }
 
--- |A generalized version of the dbus quasi-quoter which works on functions of
--- type @[Variant] -> f [Variant]@, for any functor @f@.
+-- |A generalized version of the 'dbus' quasi-quoter which works on functions of
+-- type @['DT.Variant'] -> f ['DT.Variant']@, for any 'Functor' @f@.
 dbusF :: QuasiQuoter
 dbusF = QuasiQuoter
   { quoteExp = expQuoter True
