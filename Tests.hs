@@ -17,6 +17,16 @@ prop_simple x y = show (x + y) == [dbus| i i -> s |] f x y
     f :: [Variant] -> [Variant]
     f xs = [toVariant . show . sum $ (map (fromJust . fromVariant) xs :: [Int32])]
 
+prop_nospaces x y = show (x + y) == [dbus|ii->s|] f x y
+  where
+    f :: [Variant] -> [Variant]
+    f xs = [toVariant . show . sum $ (map (fromJust . fromVariant) xs :: [Int32])]
+
+prop_spaces x y = show (x + y) == [dbus|     ii->   s      |] f x y
+  where
+    f :: [Variant] -> [Variant]
+    f xs = [toVariant . show . sum $ (map (fromJust . fromVariant) xs :: [Int32])]
+
 prop_functor x y = Just (show (x + y)) == [dbusF| i i -> s |] f x y
   where
     f :: [Variant] -> Maybe [Variant]
@@ -55,4 +65,6 @@ tests = [("simple", quickCheck prop_simple)
         ,("tuples", quickCheck prop_tuples)
         ,("retvals", quickCheck prop_retvals)
         ,("values", quickCheck prop_values)
-        ,("unit", quickCheck prop_unit)]
+        ,("unit", quickCheck prop_unit)
+        ,("no spaces", quickCheck prop_nospaces)
+        ,("spaces", quickCheck prop_spaces)]

@@ -81,7 +81,7 @@ runQuoter f s = case runParser dbusFunction () "" s of
 
 dbusFunction :: GenParser Char s DBusFunction
 dbusFunction = DBusFunction
-  <$> (space *> dbusTypes <* string "->" <* spaces)
+  <$> (spaces *> dbusTypes <* string "->" <* spaces)
   <*> dbusTypes
 
 dbusTypes :: GenParser Char s [Type]
