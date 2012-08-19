@@ -11,15 +11,15 @@ import qualified Data.Map as Map
 import Data.Maybe (fromJust)
 import Data.Word
 import Data.Int
-import qualified DBus.Types as DT
+import qualified DBus
 import Language.Haskell.TH
 import Language.Haskell.TH.Quote
 import Text.ParserCombinators.Parsec hiding ((<|>), many)
 
 data DBusFunction = DBusFunction [Type] [Type]
 
--- |A quasi-quoter to convert a function of type @['DT.Variant'] ->
--- ['DT.Variant']@ into a function of a specified static type.
+-- |A quasi-quoter to convert a function of type @['DBus.Variant'] ->
+-- ['DBus.Variant']@ into a function of a specified static type.
 --
 -- This quasi-quoter takes a signature of the form:
 --
@@ -30,11 +30,11 @@ data DBusFunction = DBusFunction [Type] [Type]
 -- Types on the left of the arrow correspond to argument types, while those on
 -- the right are return types.
 --
--- The result is a combinator which takes any function of type ['DT.Variant'] ->
--- ['DT.Variant'], assumes that its arguments and results are of the specified
+-- The result is a combinator which takes any function of type ['DBus.Variant'] ->
+-- ['DBus.Variant'], assumes that its arguments and results are of the specified
 -- number and types, and returns a function of the corresponding static type.
 --
--- For example, if @f :: ['DT.Variant'] -> ['DT.Variant']@,
+-- For example, if @f :: ['DBus.Variant'] -> ['DBus.Variant']@,
 --
 -- @
 --   ['dbus'| i s -> s a{uv} |] f
@@ -43,7 +43,7 @@ data DBusFunction = DBusFunction [Type] [Type]
 -- has type
 --
 -- @
---   Int -> String -> (String, 'Map.Map' 'Word32' 'DT.Variant')
+--   Int -> String -> (String, 'Map.Map' 'Word32' 'DBus.Variant')
 -- @
 dbus :: QuasiQuoter
 dbus = QuasiQuoter
@@ -54,7 +54,7 @@ dbus = QuasiQuoter
   }
 
 -- |A generalized version of the 'dbus' quasi-quoter which works on functions of
--- type @['DT.Variant'] -> f ['DT.Variant']@, for any 'Functor' @f@.
+-- type @['DBus.Variant'] -> f ['DBus.Variant']@, for any 'Functor' @f@.
 dbusF :: QuasiQuoter
 dbusF = QuasiQuoter
   { quoteExp = expQuoter True
@@ -99,9 +99,9 @@ dbusType =
   (char 't' *> return (ConT ''Word64)) <|>
   (char 'd' *> return (ConT ''Double)) <|>
   (char 's' *> return (ConT ''String)) <|>
-  (char 'o' *> return (ConT ''DT.ObjectPath)) <|>
-  (char 'g' *> return (ConT ''DT.Signature)) <|>
-  (char 'v' *> return (ConT ''DT.Variant)) <|>
+  (char 'o' *> return (ConT ''DBus.ObjectPath)) <|>
+  (char 'g' *> return (ConT ''DBus.Signature)) <|>
+  (char 'v' *> return (ConT ''DBus.Variant)) <|>
   array <|>
   struct
 
@@ -120,16 +120,16 @@ struct =
 
 thToVariant :: Type -> Name -> Exp
 thToVariant t name =
-  VarE 'DT.toVariant `AppE` (VarE name `SigE` t)
+  VarE 'DBus.toVariant `AppE` (VarE name `SigE` t)
 
 thFromVariant :: Bool -> [Type] -> Exp -> Q Exp
-thFromVariant functor ts exp =
+thFromVariant functor ts expr =
   if functor
-    then [| fmap $(unpack) $(return exp) |]
-    else [| $(unpack) $(return exp) |]
+    then [| fmap $(unpack) $(return expr) |]
+    else [| $(unpack) $(return expr) |]
   where
     n = length ts
-    convert t = [| \x -> (fromJust $ DT.fromVariant x) :: $(return t) |]
+    convert t = [| \x -> (fromJust $ DBus.fromVariant x) :: $(return t) |]
     apply fs = do
       xs <- replicateM n $ newName "x"
       return . LamE [TupP (map VarP xs)] . TupE $
