@@ -1,7 +1,7 @@
-{-# LANGUAGE TemplateHaskell, QuasiQuotes #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 import DBus.QuasiQuoter
-import DBus.Types
+import DBus
 import Data.Int
 import qualified Data.Map as Map
 import Data.Maybe
